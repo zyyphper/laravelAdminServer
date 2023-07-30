@@ -1,6 +1,6 @@
 <?php
 
-namespace Encore\AdminRbac;
+namespace Encore\OrgRbac;
 
 use Encore\Admin\Extension;
 
