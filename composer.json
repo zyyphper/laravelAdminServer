@@ -58,6 +58,12 @@
         "preferred-install": "dist",
         "sort-packages": true
     },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "app/Admin/extensions/laravel-admin-ext/org_rbac"
+        }
+    ],
     "minimum-stability": "dev",
     "prefer-stable": true
 }
