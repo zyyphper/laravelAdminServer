@@ -1,5 +1,5 @@
 <?php
 
-use Encore\OrgRbac\Http\Controllers\OrgRbacController;
+use \Encore\OrgRbac\Http\Controllers\OrgController;
 
-Route::get('org_rbac', OrgRbacController::class.'@index');
+Route::get('org', OrgController::class.'@index');
