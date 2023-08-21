@@ -16,18 +16,31 @@ class Duty extends Model
      */
     public function __construct(array $attributes = [])
     {
-        $connection = config('admin.database.connection') ?: config('database.default');
+        $connection = config('org.database.connection') ?: config('database.default');
 
         $this->setConnection($connection);
 
-        $this->setTable(config('admin.database.duties_table'));
+        $this->setTable(config('org.database.duties_table'));
         parent::__construct($attributes);
     }
 
     public function user()
     {
-        $userModel = config('admin.database.users_model');
+        $userModel = config('org.database.users_model');
         return $this->hasOne($userModel,'id','user_id');
+    }
+
+    public function department()
+    {
+        $department = config('org.database.departments_model');
+        return $this->hasOne($department,'id','department_id');
+    }
+
+    public function company()
+    {
+        $company = config('org.database.companies.model');
+        $department = config('org.database.departments_model');
+        return $this->hasOneThrough($company,$department);
     }
 
 }

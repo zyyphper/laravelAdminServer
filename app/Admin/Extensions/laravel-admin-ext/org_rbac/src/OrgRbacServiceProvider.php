@@ -2,6 +2,8 @@
 
 namespace Encore\OrgRbac;
 
+use Encore\OrgRbac\Services\DatabasePrimaryKeyGenerateService;
+use Encore\OrgRbac\Services\SnowFlakeService;
 use Illuminate\Support\ServiceProvider;
 
 class OrgRbacServiceProvider extends ServiceProvider
@@ -28,6 +30,10 @@ class OrgRbacServiceProvider extends ServiceProvider
 
         $this->app->booted(function () {
             OrgRbac::routes(__DIR__.'/../routes/web.php');
+        });
+
+        $this->app->singleton('primaryKeyGenerate',function () {
+            return new DatabasePrimaryKeyGenerateService();
         });
     }
 }

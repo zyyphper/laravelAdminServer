@@ -7,18 +7,28 @@ use Encore\Admin\Models\Administrator;
 
 class User extends Administrator
 {
-    protected $fillable = ['platform_id','username', 'password','name', 'is_admin'];
+    protected $fillable = ['id','platform_id','username', 'password','name', 'is_admin'];
+
+    protected $primaryKey = 'id';
+    public $incrementing = false;
 
     public function departments()
     {
-        $pivotTable = config('admin.database.duties_model');
-        $relatedModel = config('admin.database.departments_model');
-        return $this->belongsToMany($relatedModel, $pivotTable, 'user_id', 'department_id');
+        $pivotTable = config('org.database.duties_table');
+        $relatedModel = config('org.database.departments_model');
+        return $this->belongsToMany($relatedModel, $pivotTable, 'user_id', 'department_id')->withPivot('id');
     }
+
 
     public function duties()
     {
-        $dutyModel = config('admin.database.duties_model');
+        $dutyModel = config('org.database.duties_model');
         return $this->hasMany($dutyModel,'user_id');
+    }
+
+    public function info()
+    {
+        $userInfoModel = config('org.database.user_infos_model');
+        return $this->hasOne($userInfoModel,'user_id');
     }
 }

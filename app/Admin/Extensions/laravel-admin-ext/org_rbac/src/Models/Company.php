@@ -3,13 +3,14 @@
 namespace Encore\OrgRbac\Models;
 
 
-use Encore\AdminRbac\Traits\ModelRelationTree;
 use Illuminate\Database\Eloquent\Model;
 
 class Company extends Model
 {
-    use ModelRelationTree;
-    protected $fillable = ['parent_id','platform_id','name','email','phone','order'];
+    protected $fillable = ['id','parent_id','platform_id','name','email','phone','order'];
+
+    protected $primaryKey = 'id';
+    public $incrementing = false;
 
     /**
      * Create a new Eloquent model instance.
@@ -18,21 +19,22 @@ class Company extends Model
      */
     public function __construct(array $attributes = [])
     {
-        $connection = config('admin.database.connection') ?: config('database.default');
-        $relationModel = config('admin.database.departments_model');
-
+        $connection = config('org.database.connection') ?: config('database.default');
         $this->setConnection($connection);
-
-        $this->setTable(config('admin.database.companies_table'));
-        $this->setTitleColumn('name');
-        $this->setRelationModelTree($relationModel,'department_id');
-
+        $this->setTable(config('org.database.companies_table'));
         parent::__construct($attributes);
+    }
+
+
+    public function platform()
+    {
+        $platformModel = config('org.database.platforms_model');
+        return $this->belongsTo($platformModel,'platform_id');
     }
 
     public function departments()
     {
-        $departmentModel = config('admin.database.departments_model');
+        $departmentModel = config('org.database.departments_model');
         return $this->hasMany($departmentModel);
     }
 }

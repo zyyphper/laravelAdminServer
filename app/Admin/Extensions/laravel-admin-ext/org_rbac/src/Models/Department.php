@@ -3,13 +3,14 @@
 namespace Encore\OrgRbac\Models;
 
 
-use Encore\Admin\Traits\ModelTree;
 use Illuminate\Database\Eloquent\Model;
 
 class Department extends Model
 {
-    use ModelTree;
-    protected $fillable = ['parent_id','company_id','name','leader','order'];
+    protected $fillable = ['id','parent_id','company_id','name','leader','order'];
+
+    protected $primaryKey = 'id';
+    public $incrementing = false;
 
     /**
      * Create a new Eloquent model instance.
@@ -18,24 +19,28 @@ class Department extends Model
      */
     public function __construct(array $attributes = [])
     {
-        $connection = config('admin.database.connection') ?: config('database.default');
+        $connection = config('org.database.connection') ?: config('database.default');
         $this->setConnection($connection);
-
-        $this->setTable(config('admin.database.departments_table'));
-        $this->setTitleColumn('name');
+        $this->setTable(config('org.database.departments_table'));
         parent::__construct($attributes);
+    }
+
+    public function company()
+    {
+        $companyModel = config('org.database.companies_model');
+        return $this->belongsTo($companyModel,'company_id');
     }
 
     public function users()
     {
-        $pivotTable = config('admin.database.duties_model');
-        $relatedModel = config('admin.database.users_model');
+        $pivotTable = config('org.database.duties_model');
+        $relatedModel = config('org.database.users_model');
         return $this->belongsToMany($relatedModel, $pivotTable, 'department_id', 'user_id');
     }
 
     public function duties()
     {
-        $dutyModel = config('admin.database.duties_model');
+        $dutyModel = config('org.database.duties_model');
         return $this->hasMany($dutyModel,'department_id');
     }
 }

@@ -5,9 +5,12 @@ namespace Encore\OrgRbac\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Role extends Model
+class UserInfo extends Model
 {
-    protected $fillable = ['platform_id','name','slug'];
+    protected $fillable = ['user_id','phone','email', 'is_check_identity','realname', 'identity_code'];
+
+    protected $primaryKey = 'user_id';
+    public $incrementing = false;
 
     /**
      * Create a new Eloquent model instance.
@@ -17,11 +20,15 @@ class Role extends Model
     public function __construct(array $attributes = [])
     {
         $connection = config('org.database.connection') ?: config('database.default');
-
         $this->setConnection($connection);
-
-        $this->setTable(config('org.database.roles_table'));
-
+        $this->setTable(config('org.database.user_infos_table'));
         parent::__construct($attributes);
     }
+
+    public function user()
+    {
+        $userModel = config('org.database.users_model');
+        return $this->hasOne($userModel,'user_id');
+    }
+
 }

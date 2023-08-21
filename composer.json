@@ -12,7 +12,8 @@
         "laravel-admin-ext/org_rbac": "dev-main",
         "laravel/framework": "^8.75",
         "laravel/sanctum": "^2.11",
-        "laravel/tinker": "^2.5"
+        "laravel/tinker": "^2.5",
+      "ext-json": "*"
     },
     "require-dev": {
         "facade/ignition": "^2.5",
