@@ -9,6 +9,8 @@ Route::group([
     $router->resource('departments', \Encore\OrgRbac\Http\Controllers\DepartmentController::class);
     $router->resource('users', \Encore\OrgRbac\Http\Controllers\UserController::class);
     $router->resource('organizations', \Encore\OrgRbac\Http\Controllers\OrgController::class);
+    $router->resource('roles', \Encore\OrgRbac\Http\Controllers\RoleController::class);
+    $router->resource('duties', \Encore\OrgRbac\Http\Controllers\DutyController::class);
 
 });
 

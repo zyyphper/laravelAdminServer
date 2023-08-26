@@ -9,6 +9,7 @@ return [
         // User tables and model.
         'users_table' => 'org_users',
         'users_model' => \Encore\OrgRbac\Models\User::class,
+        'users_tree' => \Encore\OrgRbac\Models\Tree\User::class,
         'user_infos_table' => 'org_user_infos',
         'user_infos_model' => \Encore\OrgRbac\Models\UserInfo::class,
         'users_primary_key_generate_driver' => \Encore\OrgRbac\Services\SnowFlakeService::class,
@@ -61,5 +62,12 @@ return [
 
         'prefix' => env('ORG_AUTH_ROUTE_PREFIX', 'auth'),
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | The global Table action display class.
+    |--------------------------------------------------------------------------
+    */
+    'table_action_class' => \Encore\OrgRbac\TabTable\Displayers\DropdownActions::class,
 
 ];

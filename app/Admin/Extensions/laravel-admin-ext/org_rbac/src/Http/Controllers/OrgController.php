@@ -5,6 +5,10 @@ namespace Encore\OrgRbac\Http\Controllers;
 use Encore\Admin\Layout\Column;
 use Encore\Admin\Layout\Content;
 use Encore\Admin\Layout\Row;
+use Encore\Admin\Widgets\Table;
+use Encore\OrgRbac\Models\Enums\DepartmentType;
+use Encore\OrgRbac\Show;
+use Encore\OrgRbac\Traits\PlatformPermission;
 use Encore\OrgRbac\Widgets\Tab;
 use Encore\OrgRbac\Models\Enums\OrgType;
 use Encore\OrgRbac\RelationTree;
@@ -14,6 +18,7 @@ use Illuminate\Support\Facades\DB;
 
 class OrgController extends AdminController
 {
+    use PlatformPermission;
     protected $type;
     protected $mainId;
     protected $tab;
@@ -21,6 +26,8 @@ class OrgController extends AdminController
     protected $companyModel;
     protected $departmentModel;
     protected $userModel;
+    protected $dutyModel;
+    protected $roleModel;
 
 
     public function __construct(Request $request)
@@ -37,6 +44,10 @@ class OrgController extends AdminController
         $this->departmentModel = new $departmentModel();
         $userModel = config('org.database.users_model');
         $this->userModel = new $userModel();
+        $dutyModel = config('org.database.duties_model');
+        $this->dutyModel = new $dutyModel();
+        $roleModel = config('org.database.roles_model');
+        $this->roleModel = new $roleModel();
     }
 
     public function index(Content $content)
@@ -82,7 +93,13 @@ class OrgController extends AdminController
 
         $tree->branch(function ($branch) {
             //获取当前平台下的公司
-            return "<i class='fa'></i>&nbsp;<strong>{$branch['name']}</strong>";
+            switch ($branch['type']) {
+                case OrgType::PLATFORM:$class = "fas fa-home";break;
+                case OrgType::COMPANY:$class = "far fa-building";break;
+                case OrgType::DEPARTMENT:$class = "far fa-folder-open";break;
+                case OrgType::USER:$class = "far fa-address-card";break;
+            }
+            return "<i class='{$class}'></i>&nbsp;<strong>{$branch['name']}</strong>";
         });
 
         return $tree;
@@ -166,6 +183,54 @@ class OrgController extends AdminController
         $tab->add('用户',$userTable,$this->tab == 1);
 
         return $tab;
+    }
+
+    public function user()
+    {
+        $show = new Show($this->dutyModel->findOrFail($this->mainId));
+        $show->setBackUrl($this->request->getUri());
+        $show->fields([
+            'id' => '职权ID',
+            'department.name' => '部门名称',
+        ]);
+        $show->field('department_type','部门类型')->using(DepartmentType::$text);
+        $show->user('用户信息',function ($user) {
+            $user->setResource('/admin/auth/users');
+            $user->setBackUrl($this->request->getUri());
+            $user->id('ID');
+            $user->name(trans('admin.name'));
+            $user->avatar(trans('admin.avatar'))->image();
+            $user->created_at();
+            $user->updated_at();
+            $user->panel()->tools(function ($tools) {
+                $tools->disableEdit(false);
+                $tools->disableList();
+                $tools->disableDelete();
+            });
+        });
+        $show->roles('职权角色',function (TabTable $roleTable) {
+            $roleTable->column('id','ID');
+            $roleTable->column('name','名称');
+            $roleTable->disableCreateButton();
+            $roleTable->disableActions();
+            return $roleTable;
+        });
+        $show->setResource('/admin/auth/duties');
+        $show->panel()
+            ->title('职权')->tools(function ($tools) {
+                $tools->disableEdit(false);
+                $tools->disableList();
+                $tools->disableDelete();
+            });
+        return $show;
+    }
+
+    protected function getBackUrl()
+    {
+        $backUrl = session()->pull('user_back_url');
+        $backUrl = base64_decode($backUrl);
+        if (!$backUrl) $backUrl = url('admin/auth/organizations');
+        return $backUrl;
     }
 
 

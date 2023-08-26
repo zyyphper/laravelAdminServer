@@ -24,4 +24,11 @@ class Role extends Model
 
         parent::__construct($attributes);
     }
+
+    public function duties()
+    {
+        $pivotTable = config('org.database.role_duty_table');
+        $relatedModel = config('org.database.duties_model');
+        return $this->belongsToMany($relatedModel, $pivotTable, 'role_id', 'duty_id');
+    }
 }

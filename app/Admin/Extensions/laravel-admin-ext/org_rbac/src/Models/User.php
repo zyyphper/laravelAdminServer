@@ -31,4 +31,11 @@ class User extends Administrator
         $userInfoModel = config('org.database.user_infos_model');
         return $this->hasOne($userInfoModel,'user_id');
     }
+
+    public function roles()
+    {
+        $pivotTable = config('org.database.duties_table');
+        $relatedModel = config('org.database.roles_model');
+        return $this->belongsToMany($relatedModel, $pivotTable, 'user_id', 'department_id')->withPivot('id');
+    }
 }

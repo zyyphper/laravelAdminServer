@@ -8,7 +8,9 @@ use Encore\OrgRbac\Models\Platform AS BaseModel;
 
 class Platform extends BaseModel
 {
-    use ModelRelationTree;
+    use ModelRelationTree{
+        ModelRelationTree::boot as treeBoot;
+    }
 
     /**
      * Create a new Eloquent model instance.

@@ -30,6 +30,13 @@ class Duty extends Model
         return $this->hasOne($userModel,'id','user_id');
     }
 
+    public function userInfo()
+    {
+        $userModel = config('org.database.users_model');
+        $userInfoModel = config('org.database.user_infos_model');
+        return $this->hasOneThrough($userInfoModel,$userModel,'id','user_id','user_id','id');
+    }
+
     public function department()
     {
         $department = config('org.database.departments_model');
@@ -41,6 +48,13 @@ class Duty extends Model
         $company = config('org.database.companies.model');
         $department = config('org.database.departments_model');
         return $this->hasOneThrough($company,$department);
+    }
+
+    public function roles()
+    {
+        $pivotTable = config('org.database.role_duty_table');
+        $relatedModel = config('org.database.roles_model');
+        return $this->belongsToMany($relatedModel, $pivotTable, 'duty_id', 'role_id');
     }
 
 }

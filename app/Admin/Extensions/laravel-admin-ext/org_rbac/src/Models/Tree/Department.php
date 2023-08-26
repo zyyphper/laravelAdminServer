@@ -8,7 +8,9 @@ use Encore\OrgRbac\Models\Department AS BaseModel;
 
 class Department extends BaseModel
 {
-    use ModelRelationTree;
+    use ModelRelationTree{
+        ModelRelationTree::boot as treeBoot;
+    }
 
     /**
      * Create a new Eloquent model instance.
@@ -18,7 +20,9 @@ class Department extends BaseModel
     public function __construct(array $attributes = [])
     {
         parent::__construct($attributes);
+        $relationTreeModel = config('org.database.users_tree');
         $this->setTitleColumn('name');
+        $this->setRelationModelTree($relationTreeModel,'department_id');
     }
 
 }

@@ -3,7 +3,6 @@
 namespace Encore\OrgRbac\Http\Controllers;
 
 use Encore\Admin\Http\Controllers\AdminController AS BaseAdminController;
-use Encore\Admin\Layout\Content;
 use Illuminate\Http\Request;
 
 class AdminController extends BaseAdminController
