@@ -43,6 +43,10 @@ class CreateButton extends AbstractTool
         if (!$this->table->showCreateBtn()) {
             return '';
         }
+//        if (!OrgRbac::permission()->check($this->table->getCreateButtonUri())) {
+//            return '';
+//        }
+
         $url = $this->table->getResourceUrl()."/create";
         if ($this->urlParams) $url .= "?".$this->urlParams;
 

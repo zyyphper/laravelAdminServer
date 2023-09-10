@@ -4,9 +4,10 @@
 namespace Encore\OrgRbac\Http\Controllers;
 
 
-use Encore\Admin\Layout\Content;
 use Encore\OrgRbac\Form;
 use Encore\OrgRbac\Form\NestedForm;
+use Encore\OrgRbac\Layout\Content;
+use Encore\OrgRbac\Models\Enums\DepartmentType;
 use Encore\OrgRbac\Traits\PlatformPermission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -33,6 +34,9 @@ class UserController extends AdminController
         $this->model = new $model();
         parent::__construct($request);
         $this->departmentId = $request->input('department_id');
+        if ($this->departmentId) {
+            $this->setPlatformIdByDepartmentId($this->departmentId);
+        }
     }
 
     public function create(Content $content)

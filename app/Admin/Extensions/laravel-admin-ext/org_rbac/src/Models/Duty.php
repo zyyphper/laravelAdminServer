@@ -3,10 +3,12 @@
 namespace Encore\OrgRbac\Models;
 
 
+use Encore\OrgRbac\Traits\HasPermissions;
 use Illuminate\Database\Eloquent\Model;
 
 class Duty extends Model
 {
+    use HasPermissions;
     protected $fillable = ['user_id','department_id','department_type'];
 
     /**
@@ -41,13 +43,6 @@ class Duty extends Model
     {
         $department = config('org.database.departments_model');
         return $this->hasOne($department,'id','department_id');
-    }
-
-    public function company()
-    {
-        $company = config('org.database.companies.model');
-        $department = config('org.database.departments_model');
-        return $this->hasOneThrough($company,$department);
     }
 
     public function roles()

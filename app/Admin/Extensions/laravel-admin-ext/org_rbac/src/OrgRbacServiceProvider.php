@@ -3,11 +3,17 @@
 namespace Encore\OrgRbac;
 
 use Encore\OrgRbac\Services\DatabasePrimaryKeyGenerateService;
-use Encore\OrgRbac\Services\SnowFlakeService;
 use Illuminate\Support\ServiceProvider;
 
 class OrgRbacServiceProvider extends ServiceProvider
 {
+    /**
+     * @var array
+     */
+    protected $commands = [
+        Console\MenuCommand::class,
+        Console\DutyCommand::class
+    ];
     /**
      * {@inheritdoc}
      */
@@ -35,5 +41,15 @@ class OrgRbacServiceProvider extends ServiceProvider
         $this->app->singleton('primaryKeyGenerate',function () {
             return new DatabasePrimaryKeyGenerateService();
         });
+    }
+
+    /**
+     * Register the service provider.
+     *
+     * @return void
+     */
+    public function register()
+    {
+        $this->commands($this->commands);
     }
 }

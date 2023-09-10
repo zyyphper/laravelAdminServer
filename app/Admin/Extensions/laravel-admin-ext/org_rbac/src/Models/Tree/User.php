@@ -3,7 +3,7 @@
 namespace Encore\OrgRbac\Models\Tree;
 
 
-use Encore\Admin\Facades\Admin;
+use Encore\OrgRbac\Facades\OrgRbac;
 use Encore\OrgRbac\Models\User AS BaseModel;
 use Encore\OrgRbac\Traits\ModelRelationTree;
 use Illuminate\Support\Facades\DB;

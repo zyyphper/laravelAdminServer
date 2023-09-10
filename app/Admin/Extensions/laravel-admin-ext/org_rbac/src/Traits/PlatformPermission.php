@@ -4,6 +4,10 @@ namespace Encore\OrgRbac\Traits;
 
 
 use Encore\Admin\Facades\Admin;
+use Encore\Admin\Table;
+use Encore\OrgRbac\Form;
+use Encore\OrgRbac\Models\Enums\IsAdmin;
+use Encore\OrgRbac\TabTable\TabTable;
 
 trait PlatformPermission
 {
@@ -11,12 +15,25 @@ trait PlatformPermission
     protected $companyId;
     protected $data;
 
+    public function model()
+    {
+        $model = config('org.database.platforms_model');
+        return new $model();
+    }
+
     public function getPlatformId()
     {
         if (!empty($this->platformId)) {
             return $this->platformId;
         }
         return Admin::user()->platform_id;
+    }
+
+    public function setPlatformIdByDepartmentId($departmentId)
+    {
+        $departmentModel = config('org.database.departments_model');
+        $this->platformId = $departmentModel::find($departmentId)->company->platform->id;
+        return $this;
     }
 
     public function getCompanyId()
@@ -33,6 +50,31 @@ trait PlatformPermission
         $data[0] = "ROOT";
         return $this;
     }
+
+    public function platformAuth(&$obj)
+    {
+        if ($obj instanceof Table || $obj instanceof TabTable) {
+            if (Admin::user()->isRootAdministrator()) {
+                $obj->platform()->name("平台");
+                return;
+            }
+            $obj->model()->where('platform_id',$this->getPlatformId());
+            return;
+        }
+        if ($obj instanceof Form) {
+            if (Admin::user()->isRootAdministrator()) {
+                $obj->select('platform_id','平台')->options(
+                    $this->model()->where('is_admin',IsAdmin::NO)->get()->pluck('name','id')
+                );
+                return;
+            }
+            $obj->select('platform_id','平台')->options(
+                $this->model()->all()->pluck('name','id')
+            )->value($this->getPlatformId())->disable();
+        }
+
+    }
+
 
     public function getCompany()
     {

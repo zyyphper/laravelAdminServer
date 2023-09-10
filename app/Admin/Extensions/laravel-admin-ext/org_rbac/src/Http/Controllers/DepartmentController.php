@@ -4,7 +4,7 @@
 namespace Encore\OrgRbac\Http\Controllers;
 
 
-use Encore\Admin\Layout\Content;
+use Encore\OrgRbac\Layout\Content;
 use Encore\OrgRbac\Form;
 use Encore\OrgRbac\Models\Enums\OrgType;
 use Encore\OrgRbac\Traits\PlatformPermission;

@@ -1,6 +1,10 @@
 <?php
 
 return [
+    'duty' => [
+        'driver' => 'session',
+        'prefix' => 'admin',
+    ],
 
     'database' => [
         // Database connection for following tables.
@@ -17,6 +21,9 @@ return [
         // Menu table and model.
         'menu_table' => 'admin_menu',
         'menu_model' => \Encore\OrgRbac\Models\Menu::class,
+        'platform_menu_table' => 'platform_menu',
+        'platform_menu_model'    => \Encore\OrgRbac\Models\PlatformMenu::class,
+        'platform_menu_tree' => \Encore\OrgRbac\Models\Tree\PlatformMenu::class,
 
         //Platform tables and model
         'platforms_table' => 'admin_platforms',
@@ -39,13 +46,12 @@ return [
 
 
         //Role tables and model
-        'roles_table' => 'admin_roles',
+        'roles_table' => 'platform_roles',
         'roles_model' => \Encore\OrgRbac\Models\Role::class,
 
         // Pivot table for table above.
-        'role_duty_table'       => 'admin_role_duty',
-        'role_menu_table'        => 'admin_role_menu',
-        'platform_menu_table'    => 'admin_platform_menu',
+        'role_duty_table'       => 'platform_role_duty',
+        'role_menu_table'        => 'platform_role_menu',
     ],
 
     /*

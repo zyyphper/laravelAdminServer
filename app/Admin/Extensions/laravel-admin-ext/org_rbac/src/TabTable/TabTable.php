@@ -14,6 +14,12 @@ class TabTable extends Table
     protected $resourceUrl;
     protected $backUrl;
     protected $createHandleParams = [];
+    protected $authButtonUri = [
+        'create' => '',
+        'update' => '',
+        'delete' => '',
+    ];
+
 
 
     public function setResourceUrl($resourceUrl)
@@ -39,6 +45,16 @@ class TabTable extends Table
     public function setCreateHandleParams(array $params)
     {
         $this->createHandleParams = $params;
+    }
+
+    public function setCreateButtonUri($uri)
+    {
+        $this->authButtonUri['create'] = $uri;
+    }
+
+    public function getCreateButtonUri()
+    {
+        return $this->authButtonUri['create'];
     }
 
     public function getCreateHandleParams()

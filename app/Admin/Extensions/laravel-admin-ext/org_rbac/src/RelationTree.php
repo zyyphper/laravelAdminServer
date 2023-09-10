@@ -4,39 +4,58 @@ namespace Encore\OrgRbac;
 
 use Encore\Admin\Admin;
 use Encore\Admin\Tree;
-use Illuminate\Database\Eloquent\Model;
 
 class RelationTree extends Tree
 {
-    protected $homePath;
+    protected $actions;
+    protected $resource;
     /**
      * View of tree to render.
      *
      * @var string
      */
     protected $view = [
-        'tree'   => 'org_rbac::relationTree.tree',
-        'branch' => 'org_rbac::relationTree.branch',
+        'tree'   => 'org_rbac::tree.tree',
+        'branch' => 'org_rbac::tree.relationTree.branch',
     ];
 
-    public function __construct(Model $model = null, Closure $callback = null)
+    public function getResource()
     {
-        $this->homePath = \request()->getPathInfo();
-        parent::__construct($model, $callback);
+        if ($this->resource) return $this->resource;
+        return url(app('request')->getPathInfo());
     }
 
-    public function setHomePath($path)
+    public function setResource($resource)
     {
-        $this->homePath = $path;
+        if (!empty($resource)) {
+            $this->resource = $resource;
+        }
+    }
+
+
+    public function action($type,$actionClass,$resource = '')
+    {
+        $action = new $actionClass([
+            'type'           => $type,
+            'keyName'        => $this->model->getKeyName(),
+            'resource'       => $resource ?: $this->getResource()
+        ]);
+        $this->actions[$type][] = $action;
+    }
+
+    public function actions(array $types,$actionClass,$resource = '')
+    {
+        foreach ($types as $type) {
+            $this->action($type,$actionClass,$resource);
+        }
     }
 
     public function render()
     {
         view()->share([
             'path'           => $this->path,
-            'homePath'       => $this->homePath,
+            'actions'        => $this->actions,
             'keyName'        => $this->model->getKeyName(),
-            'column'         => "type",
             'branchView'     => $this->view['branch'],
             'branchCallback' => $this->branchCallback,
             'model'          => get_class($this->model),

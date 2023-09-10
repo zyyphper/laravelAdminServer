@@ -3,7 +3,9 @@
     <div class="dd-handle">
         {!! $branchCallback($branch) !!}
         <span class="float-right dd-nodrag">
-            <a href="{{ url("$homePath")."?type=".$branch[$column]."&main_id=".$branch[$keyName] }}"><i class="fa fa-edit"></i></a>
+            @foreach($actions AS $action)
+                {!! $action->render($branch) !!}
+            @endforeach
         </span>
     </div>
     @if(isset($branch['children']))

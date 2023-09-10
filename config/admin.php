@@ -116,7 +116,7 @@ return [
         'providers' => [
             'admin' => [
                 'driver' => 'eloquent',
-                'model'  => Encore\Admin\Models\Administrator::class,
+                'model'  => \Encore\OrgRbac\Models\User::class,
             ],
         ],
 

@@ -3,12 +3,15 @@
 namespace Encore\OrgRbac\Http\Controllers;
 
 use Encore\Admin\Layout\Column;
-use Encore\Admin\Layout\Content;
+use Encore\OrgRbac\Actions\RelationTree\DetailAction;
+use Encore\OrgRbac\Actions\Tree\EditAction;
+use Encore\OrgRbac\Actions\RelationTree\PlatformMenuAction;
+use Encore\OrgRbac\Layout\Content;
 use Encore\Admin\Layout\Row;
-use Encore\Admin\Widgets\Table;
 use Encore\OrgRbac\Models\Enums\DepartmentType;
 use Encore\OrgRbac\Show;
 use Encore\OrgRbac\Traits\PlatformPermission;
+use Encore\OrgRbac\Tree;
 use Encore\OrgRbac\Widgets\Tab;
 use Encore\OrgRbac\Models\Enums\OrgType;
 use Encore\OrgRbac\RelationTree;
@@ -19,6 +22,7 @@ use Illuminate\Support\Facades\DB;
 class OrgController extends AdminController
 {
     use PlatformPermission;
+    protected $action;
     protected $type;
     protected $mainId;
     protected $tab;
@@ -33,6 +37,8 @@ class OrgController extends AdminController
     public function __construct(Request $request)
     {
         parent::__construct($request);
+
+        $this->action = $this->request->input("action");
         $this->type =  $this->request->input("type");
         $this->mainId =  $this->request->input("main_id");
         $this->tab = $this->request->input("tab",0);
@@ -59,12 +65,22 @@ class OrgController extends AdminController
                 $row->column(8,function (Column $column) {
                 });
             } else {
-                //根据选择的是 平台 公司 部门  动态显示
-                $method = OrgType::$index[$this->type];
-                $row->column(8,function (Column $column) use($method) {
-                    $content = $this->$method();
-                    $column->row($content);
-               });
+                switch ($this->action) {
+                    case "detail":
+                        //根据选择的是 平台 公司 部门  动态显示
+                        $method = OrgType::$index[$this->type];
+                        $row->column(8,function (Column $column) use($method) {
+                            $content = $this->$method();
+                            $column->row($content);
+                        });
+                        break;
+                    case "platformMenu":
+                        $row->column(8,function (Column $column) {
+                            $column->row($this->platformMenuTreeView()->render());
+                        });
+                        break;
+                }
+
            }
         });
         return $content;
@@ -78,17 +94,14 @@ class OrgController extends AdminController
         $platformTreeModel = config('org.database.platforms_tree');
 
         $tree = new RelationTree(new $platformTreeModel());
-        $tree->setHomePath(url("/admin/auth/organizations"));
 
         $tree->disableCreate();
         $tree->disableSave();
-        $tree->setView([
-            'tree'   => 'admin::tree',
-            'branch' => 'org_rbac::relationTree.branch',
-        ]);
         $tree->nestable([
             'maxDepth' => 0, // 设置可拖动层级为 2 层，设置其他参数可参考 jquery.nestable 文档
         ]);
+        $tree->actions(OrgType::$detailShow,DetailAction::class);
+        $tree->action(OrgType::PLATFORM,PlatformMenuAction::class);
 
 
         $tree->branch(function ($branch) {
@@ -107,18 +120,65 @@ class OrgController extends AdminController
 
     public function platform()
     {
-        $table = new TabTable($this->companyModel);
-        $table->model()->whereHas('platform',function ($query) {
+        $tab = new Tab();
+        $platformTable = new TabTable($this->platformModel);
+        $platformTable->model()->where($this->platformModel->getKeyName(),$this->mainId);
+        $platformTable->setTitle('平台');
+        $platformTable->setResourceUrl(url("admin/auth/platforms"));
+        $platformTable->setCreateHandleParams([
+            'parent_id' => $this->mainId
+        ]);
+        $platformTable->setCreateButtonUri('create_platform');
+        $platformTable->column('id','ID');
+        $platformTable->column('name',trans('admin.name'));
+        $tab->add('平台 ',$platformTable,$this->tab == 0);
+        $companyTable = new TabTable($this->companyModel);
+        $companyTable->model()->whereHas('platform',function ($query) {
             $query->where($this->platformModel->getKeyName(),$this->mainId);
         });
-        $table->setTitle('公司');
-        $table->setResourceUrl(url("admin/auth/companies"));
-        $table->setCreateHandleParams([
+        $companyTable->setTitle('公司');
+        $companyTable->setResourceUrl(url("admin/auth/companies"));
+        $companyTable->setCreateHandleParams([
             'platform_id' => $this->mainId
         ]);
-        $table->column('id','ID');
-        $table->column('name',trans('admin.name'));
-        return $table->render();
+        $companyTable->setCreateButtonUri('create_company');
+        $companyTable->column('id','ID');
+        $companyTable->column('name',trans('admin.name'));
+        $tab->add('子公司 ',$companyTable,$this->tab == 1);
+        return $tab;
+    }
+
+    /**
+     * @return \Encore\Admin\Tree
+     */
+    protected function platformMenuTreeView()
+    {
+        $menuModel = config('org.database.platform_menu_tree');
+
+        $tree = new Tree(new $menuModel());
+
+        $tree->disableCreate();
+        $tree->setResource(url("admin/auth/platformMenu"));
+        $tree->action(EditAction::class);
+
+
+        $tree->branch(function ($branch) {
+            $payload = "<i class='{$branch['icon']}'></i>&nbsp;<strong>{$branch['title']}</strong>";
+
+            if (!isset($branch['children'])) {
+                if (url()->isValidUrl($branch['uri'])) {
+                    $uri = $branch['uri'];
+                } else {
+                    $uri = admin_url($branch['uri']);
+                }
+
+                $payload .= "&nbsp;&nbsp;&nbsp;<a href=\"$uri\" class=\"dd-nodrag\">$uri</a>";
+            }
+
+            return $payload;
+        });
+
+        return $tree;
     }
 
     public function company()

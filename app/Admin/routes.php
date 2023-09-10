@@ -3,6 +3,8 @@
 use Illuminate\Routing\Router;
 
 Admin::routes();
+//OrgRbac::routes();
+
 
 Route::group([
     'prefix'        => config('admin.route.prefix'),
@@ -10,7 +12,5 @@ Route::group([
     'middleware'    => config('admin.route.middleware'),
     'as'            => config('admin.route.as'),
 ], function (Router $router) {
-
     $router->get('/', 'HomeController@index')->name('home');
-
 });

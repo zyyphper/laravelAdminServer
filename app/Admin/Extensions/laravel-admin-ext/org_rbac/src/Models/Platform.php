@@ -22,6 +22,7 @@ class Platform extends Model
         parent::__construct($attributes);
     }
 
+
     public function companies()
     {
         $companyModel = config('org.database.companies_model');

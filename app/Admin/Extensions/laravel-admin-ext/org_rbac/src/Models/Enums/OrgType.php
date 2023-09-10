@@ -4,6 +4,8 @@
 namespace Encore\OrgRbac\Models\Enums;
 
 
+use function Symfony\Component\String\s;
+
 class OrgType
 {
     const PLATFORM = 0;
@@ -16,6 +18,13 @@ class OrgType
         self::COMPANY => 'company',
         self::DEPARTMENT => 'department',
         self::USER => 'user'
+    ];
+
+    public static $detailShow = [
+        self::PLATFORM,
+        self::COMPANY,
+        self::DEPARTMENT,
+        self::USER
     ];
 
 }
